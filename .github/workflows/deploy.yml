@@ -43,12 +43,34 @@ jobs:
       - name: Build
         run: |
           echo "Starting build process..."
-          npm run build 2>&1 | tee build.log || (echo "Build failed. Error log:" && cat build.log && exit 1)
+          set -e  # Exit on any error
+          npm run build
           echo "Build completed successfully"
-          ls -la out/ || echo "out directory not found"
+          echo "Checking for out directory..."
+          if [ ! -d "out" ]; then
+            echo "ERROR: out directory was not created!"
+            echo "Listing current directory:"
+            ls -la
+            echo "Listing .next directory (if exists):"
+            ls -la .next/ || echo ".next directory not found"
+            exit 1
+          fi
+          echo "out directory contents:"
+          ls -la out/
+          echo "out directory size:"
+          du -sh out/
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
+
+      - name: Verify out directory exists
+        run: |
+          if [ ! -d "out" ]; then
+            echo "ERROR: out directory does not exist. Build may have failed."
+            exit 1
+          fi
+          echo "out directory verified. Contents:"
+          ls -la out/
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
