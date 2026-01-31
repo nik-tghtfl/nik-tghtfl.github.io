@@ -1,4 +1,4 @@
-// Quibi TypeScript Types
+// Quippi TypeScript Types
 // This file will contain shared types for the application
 
 export interface Feedback {

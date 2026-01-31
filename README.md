@@ -1,4 +1,4 @@
-# Quibi - Anonymous Employee Feedback Platform
+# Quippi - Anonymous Employee Feedback Platform
 
 An anonymous employee feedback platform that enables organizations to collect, categorize (via AI), and analyze feedback while ensuring complete anonymity.
 
