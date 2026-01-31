@@ -238,8 +238,21 @@ export async function getFeedbacksFromSheet(): Promise<Feedback[]> {
           return null
         }
 
-        // Generate summary using Gemini API
-        const summary = await generateSummaryFromFeedback(feedbackText)
+        // Generate summary using Gemini API (non-blocking - use fallback if it fails)
+        let summary: string
+        try {
+          summary = await generateSummaryFromFeedback(feedbackText)
+        } catch (summaryError) {
+          // #region agent log
+          const debugLog = {location:'lib/api.ts:205',message:'Summary generation failed, using fallback',data:{error:summaryError instanceof Error?summaryError.message:String(summaryError)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'G'};
+          console.warn('[DEBUG]', debugLog);
+          fetch('http://127.0.0.1:7242/ingest/94295a68-58c0-4c7f-a369-b8d6564b2c9c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(debugLog)}).catch(()=>{});
+          // #endregion
+          // Use truncated feedback as fallback
+          summary = feedbackText.length > 100
+            ? feedbackText.substring(0, 100) + "..."
+            : feedbackText
+        }
 
         return {
           id: submissionId,
