@@ -36,16 +36,41 @@ export default function DashboardPage() {
 
   // Fetch feedbacks from Google Sheets
   const fetchFeedbacks = useCallback(async () => {
+    // #region agent log
+    const debugLog = {location:'app/dashboard/page.tsx:38',message:'fetchFeedbacks called',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'F'};
+    console.log('[DEBUG]', debugLog);
+    fetch('http://127.0.0.1:7242/ingest/94295a68-58c0-4c7f-a369-b8d6564b2c9c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(debugLog)}).catch(()=>{});
+    // #endregion
     setLoading(true)
     setError(null)
     try {
       const data = await getFeedbacksFromSheet()
+      // #region agent log
+      const debugLog1 = {location:'app/dashboard/page.tsx:42',message:'Data received from API',data:{dataLength:data.length,firstItemId:data[0]?.id||null},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'F'};
+      console.log('[DEBUG]', debugLog1);
+      fetch('http://127.0.0.1:7242/ingest/94295a68-58c0-4c7f-a369-b8d6564b2c9c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(debugLog1)}).catch(()=>{});
+      // #endregion
       setFeedbacks(data)
+      // #region agent log
+      const debugLog2 = {location:'app/dashboard/page.tsx:43',message:'State updated with feedbacks',data:{dataLength:data.length},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'F'};
+      console.log('[DEBUG]', debugLog2);
+      fetch('http://127.0.0.1:7242/ingest/94295a68-58c0-4c7f-a369-b8d6564b2c9c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(debugLog2)}).catch(()=>{});
+      // #endregion
     } catch (err) {
+      // #region agent log
+      const debugLog = {location:'app/dashboard/page.tsx:44',message:'Error in fetchFeedbacks',data:{errorMessage:err instanceof Error?err.message:String(err)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'};
+      console.error('[DEBUG]', debugLog);
+      fetch('http://127.0.0.1:7242/ingest/94295a68-58c0-4c7f-a369-b8d6564b2c9c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(debugLog)}).catch(()=>{});
+      // #endregion
       console.error("Failed to fetch feedbacks:", err)
       setError("Failed to load feedback data. Please try again later.")
     } finally {
       setLoading(false)
+      // #region agent log
+      const debugLog = {location:'app/dashboard/page.tsx:48',message:'Loading set to false',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'F'};
+      console.log('[DEBUG]', debugLog);
+      fetch('http://127.0.0.1:7242/ingest/94295a68-58c0-4c7f-a369-b8d6564b2c9c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(debugLog)}).catch(()=>{});
+      // #endregion
     }
   }, [])
 
@@ -61,7 +86,17 @@ export default function DashboardPage() {
 
   // Fetch feedbacks when component mounts and user is authenticated
   useEffect(() => {
+    // #region agent log
+    const debugLog1 = {location:'app/dashboard/page.tsx:63',message:'useEffect check',data:{mounted,isLoading,hasUser:!!user,isAdmin},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'F'};
+    console.log('[DEBUG]', debugLog1);
+    fetch('http://127.0.0.1:7242/ingest/94295a68-58c0-4c7f-a369-b8d6564b2c9c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(debugLog1)}).catch(()=>{});
+    // #endregion
     if (mounted && !isLoading && user && isAdmin) {
+      // #region agent log
+      const debugLog2 = {location:'app/dashboard/page.tsx:65',message:'Calling fetchFeedbacks from useEffect',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'F'};
+      console.log('[DEBUG]', debugLog2);
+      fetch('http://127.0.0.1:7242/ingest/94295a68-58c0-4c7f-a369-b8d6564b2c9c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(debugLog2)}).catch(()=>{});
+      // #endregion
       fetchFeedbacks()
     }
   }, [mounted, isLoading, user, isAdmin, fetchFeedbacks])
