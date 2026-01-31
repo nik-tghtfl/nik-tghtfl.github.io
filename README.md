@@ -8,30 +8,39 @@ An anonymous employee feedback platform that enables organizations to collect, c
 - **Styling:** Tailwind CSS v4 + shadcn/ui components
 - **Language:** TypeScript
 - **Fonts:** Geist Sans & Geist Mono
+- **Deployment:** GitHub Pages (static export)
+- **Integration:** n8n webhooks for feedback submission
 
 ## Project Structure
 
-\`\`\`
+```
 /
 ├── app/
 │   ├── layout.tsx          # Root layout with Navbar & Footer
 │   ├── page.tsx            # Home/landing page
 │   ├── globals.css         # Global styles & design tokens
 │   ├── feedback/
-│   │   └── page.tsx        # Feedback submission page (placeholder)
+│   │   └── page.tsx        # Feedback submission page
 │   └── dashboard/
-│       └── page.tsx        # Admin dashboard page (placeholder)
+│       └── page.tsx        # Admin dashboard (placeholder)
 ├── components/
 │   ├── layout/
-│   │   ├── Navbar.tsx      # Navigation with active state
+│   │   ├── Navbar.tsx      # Navigation with active state & logo
 │   │   └── Footer.tsx      # Anonymity notice footer
-│   └── ui/                 # shadcn/ui components (pre-installed)
-├── hooks/                  # Custom React hooks
+│   ├── feedback-form.tsx   # Feedback form component
+│   └── ui/                 # shadcn/ui components
+│       ├── alert.tsx       # Alert component for success/error states
+│       ├── button.tsx
+│       ├── card.tsx
+│       ├── label.tsx
+│       ├── select.tsx
+│       ├── switch.tsx
+│       └── textarea.tsx
 ├── lib/
 │   └── utils.ts            # Utility functions (cn helper)
 └── types/
-    └── index.ts            # Shared TypeScript interfaces
-\`\`\`
+    └── index.ts            # TypeScript interfaces
+```
 
 ## Getting Started
 
@@ -42,34 +51,47 @@ An anonymous employee feedback platform that enables organizations to collect, c
 
 ### Installation
 
-\`\`\`bash
+```bash
 # Install dependencies
 npm install
 
 # Run development server
 npm run dev
-\`\`\`
+```
 
 Open [http://localhost:3000](http://localhost:3000) to view the app.
 
+### Building for Production
+
+```bash
+# Build static site for GitHub Pages
+npm run build
+
+# Output will be in the /out directory
+```
+
 ## Development Roadmap
 
-### V0.1 - Foundation (Current)
+### V0.1 - Foundation ✅ Complete
 - [x] Project scaffolding with Next.js 16
-- [x] Navbar with navigation links and active state
+- [x] Navbar with navigation links, active state, and logo
 - [x] Footer with anonymity notice
 - [x] Home page with hero section and feature cards
 - [x] Placeholder pages for Feedback and Dashboard
 - [x] Indigo/violet primary color theme
 - [x] TypeScript types for Feedback and FeedbackProgram
+- [x] GitHub Pages deployment configuration
 
-### V0.2 - Database & Feedback Form (Next)
-- [ ] Database integration (Supabase or Neon recommended)
-- [ ] Feedback submission form with textarea
-- [ ] Store feedback in database
-- [ ] Display submitted feedback confirmation
+### V0.2 - Feedback Form ✅ Complete
+- [x] Feedback submission form with textarea
+- [x] Department selection dropdown
+- [x] Anonymous toggle switch
+- [x] Form validation (feedback length, required fields)
+- [x] n8n webhook integration
+- [x] Loading, success, and error states
+- [x] Alert component for user feedback
 
-### V0.3 - AI Categorization
+### V0.3 - AI Categorization (Next)
 - [ ] Integrate AI SDK for feedback categorization
 - [ ] Auto-categorize feedback on submission
 - [ ] Categories: Culture, Process, Management, Tools, Other
@@ -85,9 +107,38 @@ Open [http://localhost:3000](http://localhost:3000) to view the app.
 - [ ] Associate feedback with programs
 - [ ] Program-specific dashboards
 
+## Environment Variables
+
+### Required for V0.2+
+
+```env
+# n8n Webhook URL (required for feedback submission)
+NEXT_PUBLIC_N8N_WEBHOOK_URL=https://your-n8n-instance.com/webhook/your-webhook-id
+```
+
+### Setting up for GitHub Pages
+
+1. Go to your GitHub repository → **Settings** → **Secrets and variables** → **Actions**
+2. Click **New repository secret**
+3. Name: `NEXT_PUBLIC_N8N_WEBHOOK_URL`
+4. Value: Your n8n webhook URL
+5. Click **Add secret**
+
+The GitHub Actions workflow will automatically use this secret during the build process.
+
+### For Local Development
+
+Create a `.env.local` file in the project root:
+
+```env
+NEXT_PUBLIC_N8N_WEBHOOK_URL=https://your-n8n-instance.com/webhook/your-webhook-id
+```
+
+**Note:** `.env.local` is already in `.gitignore` and won't be committed.
+
 ## Design Tokens
 
-Primary color is indigo/violet. Key tokens defined in `globals.css`:
+Primary color is indigo/violet. Key tokens defined in `app/globals.css`:
 
 | Token | Usage |
 |-------|-------|
@@ -97,34 +148,20 @@ Primary color is indigo/violet. Key tokens defined in `globals.css`:
 | `--muted` | Secondary backgrounds |
 | `--accent` | Hover states, highlights |
 
-## Key Files to Modify
+## Key Features
 
-| Task | Files |
-|------|-------|
-| Add new pages | `app/[route]/page.tsx` |
-| Update navigation | `components/layout/Navbar.tsx` |
-| Add types | `types/index.ts` |
-| Global styles | `app/globals.css` |
-| New components | `components/[feature]/` |
+### Feedback Form
+- **Validation:** Minimum 10 characters, required department selection
+- **Anonymous Submission:** Toggle to submit anonymously (default: enabled)
+- **Department Selection:** Engineering, Marketing, Sales, HR, Operations, Other
+- **Real-time Feedback:** Loading, success, and error states with clear messaging
+- **n8n Integration:** Automatic submission to configured webhook
 
-## Environment Variables
-
-When adding features, you may need:
-
-\`\`\`env
-# n8n Webhook (required for V0.2+)
-NEXT_PUBLIC_N8N_WEBHOOK_URL=https://your-n8n-instance.com/webhook/your-webhook-id
-
-# Database (choose one)
-DATABASE_URL=           # Neon/PostgreSQL connection string
-NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
-
-# AI (for categorization)
-OPENAI_API_KEY=         # Or use Vercel AI Gateway
-\`\`\`
-
-**Note:** For GitHub Pages deployment, you'll need to set the `NEXT_PUBLIC_N8N_WEBHOOK_URL` environment variable in your GitHub Actions workflow or use a build-time environment variable.
+### UI Components
+- Built with shadcn/ui for consistency
+- Accessible components with proper ARIA labels
+- Responsive design for all screen sizes
+- Dark mode support (via design tokens)
 
 ## Coding Conventions
 
@@ -133,28 +170,33 @@ OPENAI_API_KEY=         # Or use Vercel AI Gateway
 - Follow existing component patterns in `components/ui/`
 - Use Server Components by default, Client Components only when needed
 - Prefix client components with `"use client"`
+- Define shared types in `types/index.ts`
 
 ## Commands
 
-\`\`\`bash
+```bash
 npm run dev      # Start development server
-npm run build    # Build for production
-npm run start    # Start production server
+npm run build    # Build for production (static export)
+npm run start    # Start production server (not used for GitHub Pages)
 npm run lint     # Run ESLint
-\`\`\`
+```
 
-## Continuing Development in Cursor
+## Deployment
 
-1. Clone this repository
-2. Open in Cursor
-3. Run `npm install`
-4. Reference this README for project structure
-5. Check `types/index.ts` for data models
-6. Use existing shadcn/ui components from `components/ui/`
+This project is configured for GitHub Pages deployment:
+
+- **Static Export:** Uses `output: 'export'` in `next.config.mjs`
+- **Base Path:** Configured for subdirectory deployment (`/tghtfl.github.io`)
+- **GitHub Actions:** Automated deployment on push to `main` branch
+- **Workflow:** `.github/workflows/deploy.yml`
 
 ## Resources
 
 - [Next.js Documentation](https://nextjs.org/docs)
 - [Tailwind CSS](https://tailwindcss.com/docs)
 - [shadcn/ui Components](https://ui.shadcn.com)
-- [Vercel AI SDK](https://sdk.vercel.ai)
+- [n8n Documentation](https://docs.n8n.io)
+
+## License
+
+Private project - All rights reserved
