@@ -1,6 +1,3 @@
-Create `.github/workflows/deploy.yml`:
-
-```yaml
 name: Deploy to GitHub Pages
 
 on:
@@ -55,10 +52,3 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-```
-
-## After Deployment
-
-Your site will be available at:
-- `https://nik-tghtfl.github.io/tghtfl.github.io/` (if using project pages)
-- Or `https://tghtfl.github.io/` (if repository is named correctly for user/organization pages)
