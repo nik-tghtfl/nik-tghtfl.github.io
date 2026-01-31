@@ -2,7 +2,7 @@
 
 import React from "react"
 
-import { useState } from "react"
+import { useState, useRef, useEffect } from "react"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import {
@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button"
 import { Alert } from "@/components/ui/alert"
 import { Loader2 } from "lucide-react"
 import type { User } from "@/types"
+import confetti from "canvas-confetti"
 
 const departments = [
   "Engineering",
@@ -50,6 +51,7 @@ export function FeedbackForm({ user }: FeedbackFormProps) {
   const [isAnonymous, setIsAnonymous] = useState(true)
   const [state, setState] = useState<SubmissionState>("idle")
   const [errorMessage, setErrorMessage] = useState("")
+  const buttonRef = useRef<HTMLButtonElement>(null)
 
   // Validate form data before submission
   const validateForm = (): boolean => {
@@ -191,6 +193,39 @@ export function FeedbackForm({ user }: FeedbackFormProps) {
       // Success state
       setState("success")
 
+      // Trigger confetti animation around the button
+      if (buttonRef.current) {
+        const rect = buttonRef.current.getBoundingClientRect()
+        const x = (rect.left + rect.right) / 2 / window.innerWidth
+        const y = (rect.top + rect.bottom) / 2 / window.innerHeight
+
+        // Create confetti burst from button position
+        confetti({
+          particleCount: 100,
+          spread: 70,
+          origin: { x, y },
+          colors: ['#4F46E5', '#F97316', '#10B981', '#3B82F6', '#8B5CF6'],
+        })
+
+        // Add a second burst for extra celebration
+        setTimeout(() => {
+          confetti({
+            particleCount: 50,
+            angle: 60,
+            spread: 55,
+            origin: { x, y },
+            colors: ['#4F46E5', '#F97316', '#10B981'],
+          })
+          confetti({
+            particleCount: 50,
+            angle: 120,
+            spread: 55,
+            origin: { x, y },
+            colors: ['#3B82F6', '#8B5CF6', '#F97316'],
+          })
+        }, 250)
+      }
+
       // Reset form after successful submission
       setTimeout(() => {
         setFeedback("")
@@ -315,6 +350,7 @@ export function FeedbackForm({ user }: FeedbackFormProps) {
 
       {/* Submit Button */}
       <Button
+        ref={buttonRef}
         type="submit"
         disabled={state === "loading"}
         className={`h-12 w-full rounded-xl text-base font-medium focus-visible:ring-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors ${
