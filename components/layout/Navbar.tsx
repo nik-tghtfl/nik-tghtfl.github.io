@@ -57,8 +57,10 @@ export function Navbar() {
   navLinks.push({ href: "/", label: "Home" })
 
   if (user) {
-    // Logged in users can submit feedback
-    navLinks.push({ href: "/feedback", label: "Submit Feedback" })
+    // Only members (not admins) can submit feedback
+    if (!isAdmin) {
+      navLinks.push({ href: "/feedback", label: "Submit Feedback" })
+    }
     
     // Only admins can see dashboard
     if (isAdmin) {

@@ -23,9 +23,35 @@ export function useAuth(): UseAuthReturn {
   useEffect(() => {
     // Only run on client side
     if (typeof window !== "undefined") {
-      const currentUser = getUser()
-      setUser(currentUser)
-      setIsLoading(false)
+      const updateUser = () => {
+        const currentUser = getUser()
+        setUser(currentUser)
+        setIsLoading(false)
+      }
+
+      // Initial check
+      updateUser()
+
+      // Listen for storage changes (e.g., when login happens in another tab/component)
+      const handleStorageChange = (e: StorageEvent) => {
+        if (e.key === "quibi_user" || e.key === null) {
+          updateUser()
+        }
+      }
+
+      window.addEventListener("storage", handleStorageChange)
+
+      // Also listen for custom event for same-tab updates
+      const handleAuthChange = () => {
+        updateUser()
+      }
+
+      window.addEventListener("auth-change", handleAuthChange)
+
+      return () => {
+        window.removeEventListener("storage", handleStorageChange)
+        window.removeEventListener("auth-change", handleAuthChange)
+      }
     }
   }, [])
 

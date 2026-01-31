@@ -77,6 +77,11 @@ export function login(username: string, password: string): User | null {
   const { password: _, ...userWithoutPassword } = user
   localStorage.setItem(STORAGE_KEY, JSON.stringify(userWithoutPassword))
 
+  // Dispatch custom event to notify components of auth change
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event("auth-change"))
+  }
+
   return userWithoutPassword
 }
 
@@ -89,6 +94,9 @@ export function logout(): void {
   }
 
   localStorage.removeItem(STORAGE_KEY)
+
+  // Dispatch custom event to notify components of auth change
+  window.dispatchEvent(new Event("auth-change"))
 }
 
 /**
