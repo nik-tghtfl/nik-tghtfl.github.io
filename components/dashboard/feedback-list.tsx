@@ -63,7 +63,7 @@ export function FeedbackList({ feedback }: FeedbackListProps) {
                 <div className="mt-3 pt-3 border-t border-gray-200">
                   <div className="flex items-start gap-2">
                     <span className="text-sm" title="AI-generated recommendation">
-                      🤖
+                      ✨
                     </span>
                     <div className="flex-1 bg-indigo-50 border border-indigo-100 rounded-lg p-3">
                       <p className="text-xs font-medium text-indigo-900 mb-1">

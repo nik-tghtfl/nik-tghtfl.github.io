@@ -42,6 +42,23 @@ function normalizeSentiment(value: string | undefined): "positive" | "neutral" |
 }
 
 /**
+ * Normalize process_area to a valid Feedback category
+ */
+function normalizeCategory(value: string | undefined): "Process" | "Communication" | "Tools" | "Culture" | "Other" {
+  if (!value) return "Other"
+  const normalized = value.trim()
+  // Case-insensitive matching for valid categories
+  const lower = normalized.toLowerCase()
+  if (lower === "process") return "Process"
+  if (lower === "communication") return "Communication"
+  if (lower === "tools") return "Tools"
+  if (lower === "culture") return "Culture"
+  if (lower === "other") return "Other"
+  // If it doesn't match, default to "Other"
+  return "Other"
+}
+
+/**
  * Fetch all feedbacks from Google Sheet and convert to Feedback[]
  */
 export async function getFeedbacksFromSheet(): Promise<Feedback[]> {
@@ -131,7 +148,7 @@ export async function getFeedbacksFromSheet(): Promise<Feedback[]> {
       const isAnonymous = parseBoolean(row[2]) // C
       const affectedDepartment = row[3] || "" // D
       const feedbackText = row[4] || "" // E
-      // row[5] = process_area (F) - not used for category
+      const processArea = row[5] || "" // F - process_area
       const userId = row[6] || "" // G
       // row[7] = user_name (H) - not in Feedback type
       // row[8] = user_role (I) - not in Feedback type
@@ -161,7 +178,7 @@ export async function getFeedbacksFromSheet(): Promise<Feedback[]> {
         feedback: feedbackText,
         department: affectedDepartment || "Other",
         anonymous: isAnonymous,
-        category: "Other" as const, // Default to "Other" as per requirements
+        category: normalizeCategory(processArea), // Read from process_area column
         sentiment: sentimentAnalysis,
         summary: summary,
         user_id: userId || "",
