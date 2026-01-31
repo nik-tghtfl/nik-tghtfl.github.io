@@ -180,4 +180,4 @@ License to be defined.
 
 ## 🙌 Acknowledgements
 
-Thanks to the AI Beavers Hackathon Hamburg organizers and mentors for creating an environment that encourages building bold, opinionated products.
+A resounding Dankeschön to the AI Beavers Hackathon Hamburg organizers and sponsors for this event!
