@@ -1,74 +1,183 @@
 # Quippi
 
-Anonymous employee feedback platform built with Next.js 14+, TypeScript, and Tailwind CSS.
+> **Quippi cuts waste by listening to your employees.**
 
-> **Note:** This site is deployed via GitHub Actions. The README is not the live site.
+Quippi is an **employee intelligence gathering platform** built during the **AI Beavers Hackathon Hamburg**.  
+It helps companies uncover hidden inefficiencies by collecting anonymous employee feedback, detecting recurring patterns, and turning them into actionable insights for leadership.
 
-## Tech Stack
+---
 
-- **Framework:** Next.js 14+ (App Router)
-- **Language:** TypeScript
-- **Styling:** Tailwind CSS
-- **UI Components:** shadcn/ui
-- **Package Manager:** npm
+## 🚨 Problem Statement
 
-## Getting Started
+**We kill bullshit processes.**
 
-### Prerequisites
+Most organizations are weighed down by **duplicate, outdated, or inefficient processes**.  
+They slow teams down, burn money, and frustrate employees — yet leadership often doesn’t see them.
 
-- Node.js 18+ and npm
+Why?
+- Employees experience the pain daily but don’t have a safe way to speak up
+- Feedback is scattered, ignored, or never analyzed properly
+- Inefficiencies hide in plain sight across teams and departments
 
-### Installation
+As a result, companies keep running the same broken processes — simply because no one connects the dots.
 
-```bash
-npm install
-```
+---
 
-### Development
+## 🚀 Elevator Pitch
 
-```bash
-npm run dev
-```
+Companies waste time and money because broken processes go unnoticed.  
+Quippi gathers **anonymous employee feedback**, analyzes it with AI, and highlights **what’s not working and why**.
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+Leaders use Quippi to:
+- Identify inefficient or duplicated workflows
+- Reduce unnecessary spending
+- Improve operational efficiency
+- Make faster, better decisions based on real employee insights
 
-### Build
+---
 
-```bash
-npm run build
-npm start
-```
+## 🧠 What Quippi Does
 
-## Project Structure
+- Collects **anonymous employee feedback**
+- Focuses on **qualitative, free-text input**
+- Uses AI to **cluster themes and detect patterns**
+- Produces **management-ready summaries instead of raw data**
+- Ensures **DSGVO- and Betriebsrat-compliant anonymity**
 
-```
-├── app/                    # Next.js App Router pages
-│   ├── layout.tsx          # Root layout with Navbar + Footer
-│   ├── page.tsx            # Home/Landing page
-│   ├── feedback/           # Feedback submission page
-│   └── dashboard/          # Admin dashboard
-├── components/
-│   ├── layout/             # Layout components (Navbar, Footer)
-│   └── ui/                 # shadcn/ui components
-├── lib/                    # Utility functions and API helpers
-└── types/                  # TypeScript type definitions
-```
+---
 
-## Features
+## 🛠️ Tech Stack & Tools
 
-- 🏠 Home page with welcome message and feedback submission CTA
-- 📝 Feedback submission page (placeholder)
-- 📊 Admin dashboard (placeholder)
-- 🎨 Modern, responsive UI with indigo color scheme
-- 🔒 Anonymous feedback assurance
+- **Claude & ChatGPT** – Planning, ideation, and structuring
+- **Gemini** – Thematic analysis and AI-powered summaries
+- **Cursor** – Frontend & backend development
+- **Google Sheets** – Data exploration and prototyping
+- **n8n** – Backend automations and workflows
 
-## Deployment
+---
 
-This project can be deployed to:
-- **Vercel** (recommended for Next.js)
-- **Netlify**
-- **GitHub Pages** (requires static export configuration)
+## 🧩 Architecture (High-Level)
 
-## License
+1. Employees submit anonymous qualitative feedback  
+2. Data flows through backend automations (n8n)  
+3. AI models cluster themes and summarize insights  
+4. Results are visualized and exported for decision-makers  
 
-MIT
+---
+
+## 🗺️ Product Roadmap (MoSCoW Prioritization)
+
+### ✅ MUST HAVE
+
+Core features required for trust, legality, and usefulness.
+
+- **Anonymous data collection**  
+  Honest feedback only works with real anonymity
+
+- **Qualitative (free-text) questions**  
+  Process problems can’t be solved with checkboxes
+
+- **Automatic AI-based theme clustering**  
+  Manual analysis does not scale
+
+- **Multilingual analysis**  
+  Employees have different language skills
+
+- **Clear AI-generated summaries per theme**  
+  Management needs clarity, not raw data
+
+- **Visualized theme analysis**  
+  Improves understanding and management buy-in
+
+- **Anonymous example quotes per theme**  
+  Builds trust and transparency
+
+- **Access to anonymized raw data**  
+  Enables verification and credibility
+
+- **Minimum response threshold**  
+  Required for DSGVO and Betriebsrat compliance
+
+- **K-Anonymity**  
+  Ensures individuals cannot be identified, even indirectly
+
+- **Role- and access-based permissions**  
+  Required for larger and enterprise organizations
+
+- **EU / Germany-based hosting**  
+  Mandatory for many companies (e.g. automotive industry)
+
+- **Exports**
+  - PDF
+  - CSV
+  - Excel  
+  For internal sharing and documentation
+
+---
+
+### 🟢 SHOULD HAVE
+
+Important for adoption, scalability, and enterprise readiness.
+
+- Survey templates for efficiency & process analysis
+- Evaluation by department / location
+- Before / after comparisons over time
+- Manual editing of AI-generated themes
+- Aggregated sentiment per theme (for prioritization)
+- Works council (Betriebsrat) information package
+- Employee onboarding & participation info package
+- Import of existing survey data
+- Integrations into existing enterprise systems
+
+---
+
+### 🟡 COULD HAVE
+
+Nice-to-have features that extend the platform.
+
+- Integration with process mining tools
+- AI-generated action recommendations
+- Slack / MS Teams integrations
+- Action & task tracking for follow-up measures
+
+---
+
+### 🚫 WILL NOT HAVE
+
+Explicitly out of scope by design.
+
+- **Person-level analytics**  
+  Violates anonymity principles and would be blocked by works councils
+
+- **Real-time monitoring**  
+  Feels like surveillance and undermines trust
+
+---
+
+## 👥 Team
+
+**Team Lead**  
+- Niklas Knezevic — [nik@taughtful.com](mailto:nik@taughtful.com)
+
+**Team Member**  
+- Phil Karg — [phil@taughtful.com](mailto:phil@taughtful.com)
+
+---
+
+## 🏁 Hackathon Context
+
+- **Event:** AI Beavers Hackathon Hamburg  
+- **Status:** Hackathon MVP / Proof of Concept  
+
+---
+
+## 📄 License
+
+Created as part of a hackathon project.  
+License to be defined.
+
+---
+
+## 🙌 Acknowledgements
+
+Thanks to the AI Beavers Hackathon Hamburg organizers and mentors for creating an environment that encourages building bold, opinionated products.
