@@ -1,8 +1,6 @@
 import React from "react"
 import type { Metadata } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
-// Analytics disabled for static export - incompatible with output: 'export'
-// import { Analytics } from "@vercel/analytics/next"
 import { Navbar } from "@/components/layout/Navbar"
 import { Footer } from "@/components/layout/Footer"
 import "./globals.css"
@@ -47,8 +45,6 @@ export default function RootLayout({
           <main className="flex-1">{children}</main>
           <Footer />
         </div>
-        {/* Analytics disabled - incompatible with static export (output: 'export') */}
-        {/* <Analytics /> */}
       </body>
     </html>
   )
