@@ -188,6 +188,16 @@ export default function DashboardPage() {
             </Button>
           </div>
         )}
+        {feedbacks.length === 0 && !loading && !error && (
+          <div className="mb-6 rounded-lg border border-yellow-500/50 bg-yellow-50 p-4">
+            <div className="flex items-center gap-2">
+              <AlertCircle className="h-5 w-5 text-yellow-600" />
+              <p className="text-sm text-yellow-800">
+                No feedback data found. The Google Sheet might be empty or the tab name might be incorrect.
+              </p>
+            </div>
+          </div>
+        )}
         <div className="space-y-8">
           <StatsCards 
             total={stats.total}
