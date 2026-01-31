@@ -54,7 +54,7 @@ const DEMO_USERS: (User & { password: string })[] = [
     displayName: "Admin User",
     role: "admin",
     team: "Management",
-    ageRange: "35-44",
+    ageRange: "45-54",
   },
 ]
 

@@ -45,7 +45,7 @@ interface FeedbackFormProps {
 
 export function FeedbackForm({ user }: FeedbackFormProps) {
   const [feedback, setFeedback] = useState("")
-  const [department, setDepartment] = useState("")
+  const [affectedDepartment, setAffectedDepartment] = useState("")
   const [processArea, setProcessArea] = useState("")
   const [isAnonymous, setIsAnonymous] = useState(true)
   const [state, setState] = useState<SubmissionState>("idle")
@@ -65,8 +65,8 @@ export function FeedbackForm({ user }: FeedbackFormProps) {
       return false
     }
 
-    if (!department) {
-      setErrorMessage("Please select your department.")
+    if (!affectedDepartment) {
+      setErrorMessage("Please select the department where this issue is most visible.")
       setState("error")
       return false
     }
@@ -80,10 +80,45 @@ export function FeedbackForm({ user }: FeedbackFormProps) {
     return true
   }
 
+  /**
+   * Cluster age range to match required format
+   */
+  const clusterAgeRange = (ageRange?: string): string => {
+    if (!ageRange) return "25-34" // Default
+    
+    // Map existing ranges to new clusters
+    const ageMap: Record<string, string> = {
+      "18-24": "18-24",
+      "25-34": "25-34",
+      "35-44": "35-44",
+      "45-54": "45-54",
+      "55+": "55-64", // Map old 55+ to 55-64
+    }
+    
+    // If already in correct format, return as-is
+    if (ageMap[ageRange]) {
+      return ageMap[ageRange]
+    }
+    
+    // Try to parse numeric age and cluster
+    const numericAge = parseInt(ageRange)
+    if (!isNaN(numericAge)) {
+      if (numericAge >= 18 && numericAge <= 24) return "18-24"
+      if (numericAge >= 25 && numericAge <= 34) return "25-34"
+      if (numericAge >= 35 && numericAge <= 44) return "35-44"
+      if (numericAge >= 45 && numericAge <= 54) return "45-54"
+      if (numericAge >= 55 && numericAge <= 64) return "55-64"
+      if (numericAge >= 65) return "65+"
+    }
+    
+    // Default fallback
+    return "25-34"
+  }
+
   // API call to n8n webhook
   const submitToN8n = async (formData: {
     feedback: string
-    department: string
+    affectedDepartment: string
     processArea: string
     isAnonymous: boolean
     user: User
@@ -108,8 +143,9 @@ export function FeedbackForm({ user }: FeedbackFormProps) {
       feedback_text: formData.feedback.trim(),
       process_area: formData.processArea,
       user_role: formData.user.role,
-      user_age_range: formData.user.ageRange || "Prefer not to say",
-      user_department: formData.department,
+      user_age_range: clusterAgeRange(formData.user.ageRange),
+      user_department: formData.user.team, // User's own department
+      affected_department: formData.affectedDepartment, // Department where issue is visible
       is_anonymous: formData.isAnonymous,
       // Include user name for n8n to filter if anonymous
       user_name: formData.user.displayName,
@@ -146,7 +182,7 @@ export function FeedbackForm({ user }: FeedbackFormProps) {
       // Submit to n8n webhook
       await submitToN8n({
         feedback,
-        department,
+        affectedDepartment,
         processArea,
         isAnonymous,
         user,
@@ -158,7 +194,7 @@ export function FeedbackForm({ user }: FeedbackFormProps) {
       // Reset form after successful submission
       setTimeout(() => {
         setFeedback("")
-        setDepartment("")
+        setAffectedDepartment("")
         setProcessArea("")
         setIsAnonymous(true)
         setState("idle")
@@ -208,14 +244,14 @@ export function FeedbackForm({ user }: FeedbackFormProps) {
         />
       </div>
 
-      {/* Department Select */}
+      {/* Affected Department Select */}
       <div className="space-y-3">
-        <Label htmlFor="department" className="text-sm font-medium">
+        <Label htmlFor="affectedDepartment" className="text-sm font-medium">
           In which department is this issue most visible?
         </Label>
-        <Select value={department} onValueChange={setDepartment} required>
+        <Select value={affectedDepartment} onValueChange={setAffectedDepartment} required>
           <SelectTrigger
-            id="department"
+            id="affectedDepartment"
             className="h-12 rounded-xl border-border/60 bg-background px-4 focus:ring-primary"
           >
             <SelectValue placeholder="Select department" />
