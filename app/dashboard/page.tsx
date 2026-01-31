@@ -58,12 +58,19 @@ export default function DashboardPage() {
       // #endregion
     } catch (err) {
       // #region agent log
-      const debugLog = {location:'app/dashboard/page.tsx:44',message:'Error in fetchFeedbacks',data:{errorMessage:err instanceof Error?err.message:String(err)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'};
-      console.error('[DEBUG]', debugLog);
+      const errorMsg = err instanceof Error ? err.message : String(err)
+      const debugLog = {location:'app/dashboard/page.tsx:59',message:'Error in fetchFeedbacks',data:{errorMessage:errorMsg,errorStack:err instanceof Error?err.stack?.substring(0,500):null,errorType:err instanceof Error?err.constructor.name:typeof err},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'};
+      console.error('[DEBUG] Error in fetchFeedbacks:', debugLog);
       fetch('http://127.0.0.1:7242/ingest/94295a68-58c0-4c7f-a369-b8d6564b2c9c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(debugLog)}).catch(()=>{});
       // #endregion
       console.error("Failed to fetch feedbacks:", err)
-      setError("Failed to load feedback data. Please try again later.")
+      // Show more specific error message
+      const userFriendlyError = errorMsg.includes("credentials not configured")
+        ? "API credentials not configured. Please check environment variables."
+        : errorMsg.includes("API error")
+        ? `API Error: ${errorMsg}`
+        : "Failed to load feedback data. Please check the console for details."
+      setError(userFriendlyError)
     } finally {
       setLoading(false)
       // #region agent log
