@@ -13,10 +13,10 @@ import { FilterChips } from "@/components/dashboard/filter-chips"
 import { FeedbackList } from "@/components/dashboard/feedback-list"
 import { 
   getRandomFeedbacks, 
-  getDashboardStats, 
-  getCategoryDistribution,
-  filterFeedbacks,
-  convertFeedbackArray 
+  calculateStatsFromFeedbacks,
+  calculateCategoryDistributionFromFeedbacks,
+  convertFeedbackArray,
+  type Feedback
 } from "@/lib/data/feedbacks"
 import type { Category, FeedbackItem, DashboardStats, CategoryData } from "@/types"
 
@@ -25,12 +25,13 @@ export default function DashboardPage() {
   const { user, isLoading, isAdmin } = useAuth()
   const [mounted, setMounted] = useState(false)
   const [activeFilter, setActiveFilter] = useState<Category>("All")
-  // Get fresh random data each time component mounts - 20 random feedbacks
-  const [randomFeedbacks, setRandomFeedbacks] = useState<FeedbackItem[]>(() => 
-    convertFeedbackArray(getRandomFeedbacks(20))
-  )
-  const [stats] = useState<DashboardStats>(() => getDashboardStats())
-  const [categoryDistribution] = useState<CategoryData[]>(() => getCategoryDistribution())
+  // Get fresh random data each time component mounts - 20 random feedbacks (raw Feedback[])
+  const [randomFeedbacksRaw, setRandomFeedbacksRaw] = useState<Feedback[]>(() => getRandomFeedbacks(20))
+  
+  // Calculate everything from the same 20 random feedbacks
+  const randomFeedbacks = convertFeedbackArray(randomFeedbacksRaw)
+  const stats = calculateStatsFromFeedbacks(randomFeedbacksRaw)
+  const categoryDistribution = calculateCategoryDistributionFromFeedbacks(randomFeedbacksRaw)
 
   useEffect(() => {
     setMounted(true)
@@ -99,7 +100,8 @@ export default function DashboardPage() {
             <button
               onClick={() => {
                 // Refresh random selection - get 20 new random feedbacks
-                setRandomFeedbacks(convertFeedbackArray(getRandomFeedbacks(20)))
+                // This will trigger recalculation of stats and category distribution
+                setRandomFeedbacksRaw(getRandomFeedbacks(20))
               }}
               className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
               title="Refresh data"

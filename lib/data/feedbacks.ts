@@ -661,7 +661,83 @@ export function convertFeedbackArray(feedbacks: Feedback[]): FeedbackItem[] {
 }
 
 /**
- * Get dashboard stats in DashboardStats format
+ * Calculate stats from a specific array of feedbacks
+ */
+export function calculateStatsFromFeedbacks(feedbacks: Feedback[]): DashboardStats {
+  const total = feedbacks.length
+  
+  // Calculate this week's feedback
+  const weekAgo = new Date()
+  weekAgo.setDate(weekAgo.getDate() - 7)
+  const thisWeek = feedbacks.filter(f => new Date(f.timestamp) > weekAgo).length
+
+  // Calculate category distribution
+  const byCategory = {
+    Process: feedbacks.filter(f => f.category === "Process").length,
+    Communication: feedbacks.filter(f => f.category === "Communication").length,
+    Tools: feedbacks.filter(f => f.category === "Tools").length,
+    Culture: feedbacks.filter(f => f.category === "Culture").length,
+    Other: feedbacks.filter(f => f.category === "Other").length,
+  }
+
+  // Calculate sentiment distribution
+  const bySentiment = {
+    positive: feedbacks.filter(f => f.sentiment === "positive").length,
+    neutral: feedbacks.filter(f => f.sentiment === "neutral").length,
+    negative: feedbacks.filter(f => f.sentiment === "negative").length,
+  }
+
+  // Find top category
+  const topCategory = Object.entries(byCategory).sort((a, b) => b[1] - a[1])[0]?.[0] || "Process"
+
+  // Calculate sentiment score (percentage of positive)
+  const sentimentScore = total > 0
+    ? Math.round((bySentiment.positive / total) * 100)
+    : 0
+
+  // Sentiment trend (mock for now, can be calculated from historical data later)
+  const sentimentTrend = Math.floor(Math.random() * 11) - 5 // Random between -5 and +5
+
+  return {
+    total,
+    thisWeek,
+    topCategory,
+    sentimentScore,
+    sentimentTrend
+  }
+}
+
+/**
+ * Calculate category distribution from a specific array of feedbacks
+ */
+export function calculateCategoryDistributionFromFeedbacks(feedbacks: Feedback[]): CategoryData[] {
+  const byCategory = {
+    Process: feedbacks.filter(f => f.category === "Process").length,
+    Communication: feedbacks.filter(f => f.category === "Communication").length,
+    Tools: feedbacks.filter(f => f.category === "Tools").length,
+    Culture: feedbacks.filter(f => f.category === "Culture").length,
+    Other: feedbacks.filter(f => f.category === "Other").length,
+  }
+  
+  const colors: Record<string, string> = {
+    Process: "#2563EB",
+    Communication: "#3B82F6",
+    Tools: "#60A5FA",
+    Culture: "#93C5FD",
+    Other: "#BFDBFE"
+  }
+
+  const categories: Feedback["category"][] = ["Process", "Communication", "Tools", "Culture", "Other"]
+
+  return categories.map(category => ({
+    name: category,
+    count: byCategory[category] || 0,
+    fill: colors[category]
+  }))
+}
+
+/**
+ * Get dashboard stats in DashboardStats format (from all feedbacks)
  */
 export function getDashboardStats(): DashboardStats {
   const stats = getStats()
@@ -684,7 +760,7 @@ export function getDashboardStats(): DashboardStats {
 }
 
 /**
- * Convert category stats to CategoryData[] format for the chart
+ * Convert category stats to CategoryData[] format for the chart (from all feedbacks)
  */
 export function getCategoryDistribution(): CategoryData[] {
   const stats = getStats()
