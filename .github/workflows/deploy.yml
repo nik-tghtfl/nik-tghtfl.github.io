@@ -41,10 +41,19 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Cache node modules
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
       - name: Install dependencies
+        timeout-minutes: 10
         run: |
           echo "Installing dependencies..."
-          npm install
+          npm ci --prefer-offline --no-audit
           echo "Dependencies installed successfully"
 
       - name: Verify installation
@@ -55,6 +64,7 @@ jobs:
           echo "NPM version: $(npm --version)"
 
       - name: Build
+        timeout-minutes: 15
         env:
           NEXT_PUBLIC_N8N_WEBHOOK_URL: ${{ secrets.NEXT_PUBLIC_N8N_WEBHOOK_URL }}
           NEXT_PUBLIC_GOOGLE_SHEET_ID: ${{ secrets.NEXT_PUBLIC_GOOGLE_SHEET_ID }}
