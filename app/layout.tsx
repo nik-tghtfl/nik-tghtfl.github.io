@@ -1,7 +1,10 @@
 import React from "react"
 import type { Metadata } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
-import { Analytics } from "@vercel/analytics/next"
+// #region agent log
+// Analytics disabled for static export - incompatible with output: 'export'
+// #endregion
+// import { Analytics } from "@vercel/analytics/next"
 import { Navbar } from "@/components/layout/Navbar"
 import { Footer } from "@/components/layout/Footer"
 import "./globals.css"
@@ -46,7 +49,10 @@ export default function RootLayout({
           <main className="flex-1">{children}</main>
           <Footer />
         </div>
-        <Analytics />
+        {/* #region agent log */}
+        {/* Analytics disabled - incompatible with static export (output: 'export') */}
+        {/* #endregion */}
+        {/* <Analytics /> */}
       </body>
     </html>
   )
