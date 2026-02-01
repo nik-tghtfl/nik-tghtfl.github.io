@@ -33,7 +33,7 @@ export function useAuth(): UseAuthReturn {
           setUser(currentUser)
           setIsLoading(false)
           // #region agent log
-          console.log('[AUTH DEBUG] isLoading set to false');
+          console.log('[AUTH DEBUG] isLoading set to false', { hasUser: !!currentUser });
           // #endregion
         } catch (error) {
           // #region agent log
