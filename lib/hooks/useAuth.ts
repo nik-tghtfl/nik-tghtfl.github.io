@@ -27,18 +27,30 @@ export function useAuth(): UseAuthReturn {
         try {
           const currentUser = getUser()
           // #region agent log
-          console.log('[AUTH DEBUG] updateUser called', { hasUser: !!currentUser });
-          fetch('http://127.0.0.1:7242/ingest/94295a68-58c0-4c7f-a369-b8d6564b2c9c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/hooks/useAuth.ts:26',message:'updateUser called',data:{hasUser:!!currentUser},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'G'})}).catch(()=>{});
+          if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            console.log('[AUTH DEBUG] updateUser called', { hasUser: !!currentUser });
+            // Use setTimeout to make this non-blocking
+            setTimeout(() => {
+              fetch('http://127.0.0.1:7242/ingest/94295a68-58c0-4c7f-a369-b8d6564b2c9c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/hooks/useAuth.ts:26',message:'updateUser called',data:{hasUser:!!currentUser},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'G'})}).catch(()=>{});
+            }, 0);
+          }
           // #endregion
           setUser(currentUser)
           setIsLoading(false)
           // #region agent log
-          console.log('[AUTH DEBUG] isLoading set to false', { hasUser: !!currentUser });
+          if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            console.log('[AUTH DEBUG] isLoading set to false', { hasUser: !!currentUser });
+          }
           // #endregion
         } catch (error) {
           // #region agent log
-          console.error('[AUTH DEBUG] updateUser error', error);
-          fetch('http://127.0.0.1:7242/ingest/94295a68-58c0-4c7f-a369-b8d6564b2c9c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/hooks/useAuth.ts:35',message:'updateUser error',data:{error:error instanceof Error ? error.message : String(error)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'H'})}).catch(()=>{});
+          if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            console.error('[AUTH DEBUG] updateUser error', error);
+            // Use setTimeout to make this non-blocking
+            setTimeout(() => {
+              fetch('http://127.0.0.1:7242/ingest/94295a68-58c0-4c7f-a369-b8d6564b2c9c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/hooks/useAuth.ts:35',message:'updateUser error',data:{error:error instanceof Error ? error.message : String(error)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'H'})}).catch(()=>{});
+            }, 0);
+          }
           // #endregion
           setUser(null)
           setIsLoading(false)

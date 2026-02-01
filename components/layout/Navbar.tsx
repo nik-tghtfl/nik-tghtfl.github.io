@@ -66,9 +66,12 @@ export function Navbar() {
 
   // #region agent log
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
       console.log('[NAVBAR DEBUG] useAuth state', { user: !!user, isLoading, isAdmin, pathname });
-      fetch('http://127.0.0.1:7242/ingest/94295a68-58c0-4c7f-a369-b8d6564b2c9c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'components/layout/Navbar.tsx:68',message:'Navbar useAuth state',data:{hasUser:!!user,isLoading:isLoading,isAdmin:isAdmin,pathname:pathname},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
+      // Use setTimeout to make this non-blocking
+      setTimeout(() => {
+        fetch('http://127.0.0.1:7242/ingest/94295a68-58c0-4c7f-a369-b8d6564b2c9c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'components/layout/Navbar.tsx:68',message:'Navbar useAuth state',data:{hasUser:!!user,isLoading:isLoading,isAdmin:isAdmin,pathname:pathname},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
+      }, 0);
     }
   }, [user, isLoading, isAdmin, pathname]);
   // #endregion
@@ -76,9 +79,12 @@ export function Navbar() {
   useEffect(() => {
     setMounted(true)
     // #region agent log
-    if (typeof window !== 'undefined') {
+    if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
       console.log('[NAVBAR DEBUG] Navbar mounted');
-      fetch('http://127.0.0.1:7242/ingest/94295a68-58c0-4c7f-a369-b8d6564b2c9c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'components/layout/Navbar.tsx:75',message:'Navbar mounted',data:{pathname:pathname},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'F'})}).catch(()=>{});
+      // Use setTimeout to make this non-blocking
+      setTimeout(() => {
+        fetch('http://127.0.0.1:7242/ingest/94295a68-58c0-4c7f-a369-b8d6564b2c9c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'components/layout/Navbar.tsx:75',message:'Navbar mounted',data:{pathname:pathname},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'F'})}).catch(()=>{});
+      }, 0);
     }
     // #endregion
   }, [])
@@ -91,7 +97,7 @@ export function Navbar() {
   // Show loading state to avoid hydration mismatch
   if (!mounted || isLoading) {
     // #region agent log
-    if (typeof window !== 'undefined') {
+    if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
       console.log('[NAVBAR DEBUG] Showing loading state', { mounted, isLoading });
     }
     // #endregion
@@ -110,7 +116,7 @@ export function Navbar() {
   }
 
   // #region agent log
-  if (typeof window !== 'undefined') {
+  if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
     console.log('[NAVBAR DEBUG] Rendering full navbar', { hasUser: !!user, navLinksCount: navLinks.length });
   }
   // #endregion
