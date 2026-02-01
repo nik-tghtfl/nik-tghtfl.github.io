@@ -309,7 +309,7 @@ export async function getBlastsFromSheet(): Promise<Blast[]> {
  */
 export async function createQuipInMock(quip: Omit<Quip, "id" | "created_at" | "responses">): Promise<Quip> {
   const webhookUrl = process.env.NEXT_PUBLIC_N8N_QUIP_WEBHOOK_URL || 
-    "https://niktaughtful.app.n8n.cloud/webhook-test/533e2bee-94c9-44b3-83ca-4da889133ca3"
+    "https://niktaughtful.app.n8n.cloud/webhook/533e2bee-94c9-44b3-83ca-4da889133ca3"
 
   if (!webhookUrl) {
     throw new Error("Quip webhook URL is not configured.")
