@@ -17,7 +17,7 @@ import {
   convertFeedbackArray,
   type Feedback
 } from "@/lib/data/feedbacks"
-import { getFeedbacksFromSheet, getQuipsFromMock, getQuipResponsesFromMock, createQuipInMock, updateQuipStatus, sendDebugLog } from "@/lib/api"
+import { getFeedbacksFromSheet, getQuipsFromSheet, getQuipResponsesFromMock, createQuipInMock, updateQuipStatus, sendDebugLog } from "@/lib/api"
 import type { Category, FeedbackItem, DashboardStats, CategoryData, Quip, QuipResponse } from "@/types"
 import { QuipList } from "@/components/quips/QuipList"
 import { QuipDetail } from "@/components/quips/QuipDetail"
@@ -105,7 +105,7 @@ export default function DashboardPage() {
   const fetchQuips = useCallback(async () => {
     if (!isAdmin) return
     try {
-      const data = await getQuipsFromMock()
+      const data = await getQuipsFromSheet()
       setQuips(data)
     } catch (error) {
       console.error("Failed to fetch quips:", error)

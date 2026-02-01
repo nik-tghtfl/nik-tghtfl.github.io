@@ -8,6 +8,8 @@ import type { Quip, QuipResponse } from "@/types"
 // Google Sheets Configuration
 const SHEET_NAME = "Open-Feedback"
 const SHEET_RANGE = `${SHEET_NAME}!A2:M` // Skip header row, get columns A-M
+const QUIPS_SHEET_NAME = "Quips"
+const QUIPS_SHEET_RANGE = `${QUIPS_SHEET_NAME}!A2:G` // Skip header row, get columns A-G (G=status if exists)
 
 /**
  * Helper to send debug logs only in development (localhost)
@@ -207,7 +209,102 @@ export async function getFeedbacksFromSheet(): Promise<Feedback[]> {
 }
 
 /**
- * Fetch all quips from mock data
+ * Fetch all quips from Google Sheet
+ */
+export async function getQuipsFromSheet(): Promise<Quip[]> {
+  const sheetId = process.env.NEXT_PUBLIC_GOOGLE_SHEET_ID
+  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_API_KEY
+
+  if (!sheetId || !apiKey) {
+    console.error(
+      "Google Sheets API credentials not configured. Please set NEXT_PUBLIC_GOOGLE_SHEET_ID and NEXT_PUBLIC_GOOGLE_API_KEY"
+    )
+    throw new Error("Google Sheets API credentials not configured. Check environment variables.")
+  }
+
+  try {
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${QUIPS_SHEET_RANGE}?key=${apiKey}`
+    const response = await fetch(url)
+
+    if (!response.ok) {
+      throw new Error(`Google Sheets API error: ${response.statusText}`)
+    }
+
+    const data = await response.json()
+
+    if (!data.values || data.values.length === 0) {
+      return []
+    }
+
+    // Map rows to Quip objects
+    // Column mapping based on webhook payload:
+    // A=quip_submission_time, B=quip_id, C=quip_title, D=quip_text, E=quip_title_user_id, F=quip_deadline, G=status (optional)
+    const quips: Quip[] = []
+
+    for (let i = 0; i < data.values.length; i++) {
+      const row = data.values[i]
+      
+      // Extract values from row (columns A-G)
+      const submissionTime = row[0] || "" // A - quip_submission_time
+      const quipId = row[1] || "" // B - quip_id
+      const title = row[2] || "" // C - quip_title
+      const description = row[3] || "" // D - quip_text
+      const createdBy = row[4] || "" // E - quip_title_user_id
+      const deadline = row[5] || "" // F - quip_deadline
+      const statusColumn = row[6] || "" // G - status (optional)
+
+      // Skip empty rows
+      if (!quipId || !title) {
+        continue
+      }
+
+      // Determine status: use column G if present, otherwise infer from deadline
+      let status: "active" | "closed" = "active"
+      if (statusColumn) {
+        const statusLower = statusColumn.toLowerCase().trim()
+        if (statusLower === "closed" || statusLower === "inactive") {
+          status = "closed"
+        } else {
+          status = "active"
+        }
+      } else if (deadline) {
+        // If no status column, infer from deadline
+        try {
+          const deadlineDate = parseDateSafely(deadline)
+          const now = new Date()
+          if (deadlineDate < now) {
+            status = "closed"
+          }
+        } catch (error) {
+          // If date parsing fails, default to active
+          console.warn(`Failed to parse deadline for quip ${quipId}:`, error)
+        }
+      }
+
+      // Parse created_at date
+      const createdAt = submissionTime || new Date().toISOString()
+
+      quips.push({
+        id: quipId,
+        title: title.trim(),
+        description: description?.trim() || undefined,
+        created_at: createdAt,
+        deadline: deadline || undefined,
+        status,
+        created_by: createdBy || "admin",
+        responses: 0, // Will be calculated separately if needed
+      })
+    }
+
+    return quips
+  } catch (error) {
+    console.error("Failed to fetch quips from Google Sheets:", error)
+    throw error
+  }
+}
+
+/**
+ * Fetch all quips from mock data (fallback)
  */
 export async function getQuipsFromMock(): Promise<Quip[]> {
   // Import mock data

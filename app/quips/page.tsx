@@ -8,7 +8,7 @@ import { Megaphone } from "lucide-react"
 import { useAuth } from "@/lib/hooks/useAuth"
 import { QuipList } from "@/components/quips/QuipList"
 import { RespondModal } from "@/components/quips/RespondModal"
-import { getQuipsFromMock, submitQuipResponse } from "@/lib/api"
+import { getQuipsFromSheet, submitQuipResponse } from "@/lib/api"
 import type { Quip, QuipResponse } from "@/types"
 
 /**
@@ -103,7 +103,7 @@ export default function QuipsPage() {
     
     setLoading(true)
     try {
-      const data = await getQuipsFromMock()
+      const data = await getQuipsFromSheet()
       // Filter to only active quips for users
       const activeQuips = data.filter(q => q.status === "active")
       setQuips(activeQuips)
