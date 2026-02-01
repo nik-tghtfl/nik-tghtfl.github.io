@@ -43,6 +43,33 @@ function saveRespondedQuipId(userId: string, quipId: string): void {
   }
 }
 
+/**
+ * Helper to clear all quip responses from localStorage
+ * This resets the status so users can submit responses again
+ */
+function clearAllQuipResponses(): void {
+  if (typeof window === "undefined") return
+  try {
+    // Clear all localStorage keys that match the quip response pattern
+    const keysToRemove: string[] = []
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i)
+      if (key && key.startsWith('quibi_quip_responses_')) {
+        keysToRemove.push(key)
+      }
+    }
+    keysToRemove.forEach(key => localStorage.removeItem(key))
+    console.log(`Cleared ${keysToRemove.length} quip response records`)
+  } catch (error) {
+    console.error("Failed to clear quip responses from localStorage:", error)
+  }
+}
+
+// Expose clear function to window for easy access in browser console
+if (typeof window !== "undefined") {
+  (window as any).clearQuipResponses = clearAllQuipResponses
+}
+
 export default function HomePage() {
   const { user, isLoading, isAdmin } = useAuth()
   const [mounted, setMounted] = useState(false)
