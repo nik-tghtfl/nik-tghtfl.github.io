@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { AlertCircle, MessageSquareText, RefreshCw, Network, Plus, Megaphone } from "lucide-react"
+import { AlertCircle, MessageSquareText, RefreshCw, Network, Plus, Megaphone, RotateCcw } from "lucide-react"
 import { useAuth } from "@/lib/hooks/useAuth"
 import { StatsCards } from "@/components/dashboard/stats-cards"
 import { CategoryChart } from "@/components/dashboard/category-chart"
@@ -37,6 +37,7 @@ export default function DashboardPage() {
   const [quipResponses, setQuipResponses] = useState<QuipResponse[]>([])
   const [createQuipModalOpen, setCreateQuipModalOpen] = useState(false)
   const [activeQuipTab, setActiveQuipTab] = useState<"active" | "closed">("active")
+  const [resetSuccess, setResetSuccess] = useState(false)
   
   // Calculate everything from the fetched feedbacks
   const feedbackItems = convertFeedbackArray(feedbacks)
@@ -323,14 +324,34 @@ export default function DashboardPage() {
                     </p>
                   </div>
                 </div>
-                <Button
-                  className="bg-blue-600 hover:bg-blue-700 text-white"
-                  onClick={() => setCreateQuipModalOpen(true)}
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Create Quip
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    className="border-orange-500 text-orange-600 hover:bg-orange-50"
+                    onClick={handleResetQuipResponses}
+                    title="Reset quip response tracking - allows users to submit responses again"
+                  >
+                    <RotateCcw className="h-4 w-4 mr-2" />
+                    Reset Responses
+                  </Button>
+                  <Button
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                    onClick={() => setCreateQuipModalOpen(true)}
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Create Quip
+                  </Button>
+                </div>
               </div>
+
+              {resetSuccess && (
+                <div className="mb-4 rounded-lg border border-green-200 bg-green-50 p-3">
+                  <div className="flex items-center gap-2 text-sm text-green-800">
+                    <AlertCircle className="h-4 w-4" />
+                    <span>Quip response tracking has been reset. Users can now submit responses again.</span>
+                  </div>
+                </div>
+              )}
 
               <Tabs
                 value={activeQuipTab}
