@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
+import Image from "next/image"
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/lib/hooks/useAuth"
 import { Button } from "@/components/ui/button"
@@ -11,9 +12,14 @@ import { Badge } from "@/components/ui/badge"
 function Logo() {
   return (
     <div className="flex items-center gap-2">
-      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-        <span className="text-sm font-bold text-primary-foreground">Q</span>
-      </div>
+      <Image
+        src="/logo.png"
+        alt="Quippi Logo"
+        width={32}
+        height={32}
+        className="h-8 w-8 object-contain"
+        priority
+      />
       <span className="text-2xl font-bold text-foreground">Quippi</span>
     </div>
   )
