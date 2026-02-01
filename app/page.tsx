@@ -240,14 +240,14 @@ export default function HomePage() {
           </Card>
         </section>
       )}
-    </div>
 
-    <RespondModal
-      open={respondModalOpen}
-      onOpenChange={setRespondModalOpen}
-      quip={selectedQuip}
-      defaultDepartment={user?.team || ""}
-      onSubmit={handleSubmitResponse}
-    />
+      <RespondModal
+        open={respondModalOpen}
+        onOpenChange={setRespondModalOpen}
+        quip={selectedQuip}
+        defaultDepartment={user?.team || ""}
+        onSubmit={handleSubmitResponse}
+      />
+    </div>
   )
 }
