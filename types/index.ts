@@ -64,6 +64,7 @@ export interface QuipResponse {
   user_id: string
   created_at: string
   sentiment?: "positive" | "neutral" | "negative"
+  is_anonymous?: boolean
 }
 
 export const DEPARTMENTS = [

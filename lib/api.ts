@@ -303,6 +303,7 @@ export async function submitQuipResponse(response: Omit<QuipResponse, "id" | "cr
     user_id: response.user_id,
     created_at: createdAt,
     sentiment: response.sentiment || "",
+    is_anonymous: response.is_anonymous ?? true, // Default to true if not specified
   }
 
   const apiResponse = await fetch(webhookUrl, {

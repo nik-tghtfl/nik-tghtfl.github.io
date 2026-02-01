@@ -60,6 +60,7 @@ export function RespondModal({
       department,
       user_id: "user-1",
       sentiment: undefined,
+      is_anonymous: isAnonymous,
     })
 
     setIsSuccess(true)
