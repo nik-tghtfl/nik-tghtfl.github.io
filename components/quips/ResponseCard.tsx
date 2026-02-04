@@ -24,6 +24,18 @@ function getDepartmentColor(department: string): string {
   return colors[department] || "bg-gray-100 text-gray-700"
 }
 
+function getSentimentEmoji(sentiment?: "positive" | "neutral" | "negative"): string {
+  switch (sentiment) {
+    case "positive":
+      return "😊"
+    case "negative":
+      return "😔"
+    case "neutral":
+    default:
+      return "😐"
+  }
+}
+
 export function ResponseCard({ response, userDepartment }: ResponseCardProps) {
   // Use userDepartment from Users sheet if available, otherwise fall back to response.department
   const department = userDepartment || response.department || "Unknown"
@@ -31,7 +43,12 @@ export function ResponseCard({ response, userDepartment }: ResponseCardProps) {
   return (
     <Card className="h-full">
       <CardContent className="pt-6 space-y-4">
-        <p className="text-sm leading-relaxed text-gray-800">{response.response}</p>
+        <div className="flex items-start gap-3">
+          <span className="text-xl" aria-label={response.sentiment || "neutral"}>
+            {getSentimentEmoji(response.sentiment)}
+          </span>
+          <p className="text-sm leading-relaxed text-gray-800 flex-1">{response.response}</p>
+        </div>
         <div className="flex items-center justify-between">
           {department && (
             <Badge variant="secondary" className={getDepartmentColor(department)}>

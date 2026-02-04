@@ -638,7 +638,7 @@ export async function getUsersFromSheet(): Promise<Map<string, { name: string; d
     "User List",
     "Users List"
   ]
-  const USER_SHEET_RANGE = `!A2:C` // Skip header row, columns A-C (user_id, name, department)
+  const USER_SHEET_RANGE = `!A2:D` // Skip header row, columns A-D (user_id, name, password, department)
 
   for (const sheetName of USER_SHEET_NAMES) {
     try {
@@ -663,7 +663,8 @@ export async function getUsersFromSheet(): Promise<Map<string, { name: string; d
       for (const row of data.values) {
         const userId = (row[0] || "").trim() // A - user_id
         const name = (row[1] || "").trim() // B - name
-        const department = (row[2] || "").trim() // C - department
+        // row[2] = password (C) - skip this
+        const department = (row[3] || "").trim() // D - user_department
 
         if (userId && name) {
           userMap.set(userId, {
