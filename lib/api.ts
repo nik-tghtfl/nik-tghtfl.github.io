@@ -304,6 +304,194 @@ export async function getQuipsFromSheet(): Promise<Quip[]> {
 }
 
 /**
+ * Fetch all quip responses from Google Sheet
+ */
+export async function getQuipResponsesFromSheet(): Promise<QuipResponse[]> {
+  const sheetId = process.env.NEXT_PUBLIC_GOOGLE_SHEET_ID
+  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_API_KEY
+
+  if (!sheetId || !apiKey) {
+    console.error(
+      "Google Sheets API credentials not configured. Please set NEXT_PUBLIC_GOOGLE_SHEET_ID and NEXT_PUBLIC_GOOGLE_API_KEY"
+    )
+    return []
+  }
+
+  // Try multiple sheet name variations
+  const QUIP_RESPONSES_SHEET_NAMES = [
+    "Quips Responses", // Prioritize the correct plural name
+    "Quip Responses",
+    "QuipResponses",
+    "Quip_Responses",
+    "quip_responses",
+    "Quip-Responses"
+  ]
+  const QUIP_RESPONSES_SHEET_RANGE = `!A2:I` // Extended to column I for user_name
+
+  // Try each sheet name variation
+  for (const sheetName of QUIP_RESPONSES_SHEET_NAMES) {
+    try {
+      const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${encodeURIComponent(sheetName)}${QUIP_RESPONSES_SHEET_RANGE}?key=${apiKey}`
+      const response = await fetch(url)
+
+      if (!response.ok) {
+        // If 400 error, try next sheet name
+        if (response.status === 400) {
+          continue
+        }
+        throw new Error(`Google Sheets API error: ${response.statusText}`)
+      }
+
+      const data = await response.json()
+
+      if (!data.values || data.values.length === 0) {
+        return []
+      }
+
+      // Map rows to QuipResponse objects
+      // Column mapping: A=quip_response_id, B=quip_id, C=response_text, D=department,
+      // E=user_id, F=created_at, G=sentiment, H=is_anonymous, I=quip_response_user_name
+      const responses: QuipResponse[] = []
+
+      for (let i = 0; i < data.values.length; i++) {
+        const row = data.values[i]
+
+        // Extract values from row (columns A-I)
+        const responseId = (row[0] || "").trim() // A - quip_response_id
+        const rowQuipId = (row[1] || "").trim() // B - quip_id
+        const responseText = (row[2] || "").trim() // C - response_text
+        const department = (row[3] || "").trim() // D - department
+        const userId = (row[4] || "").trim() // E - user_id
+        const createdAt = (row[5] || "").trim() // F - created_at
+        const sentiment = (row[6] || "").trim() // G - sentiment
+        const isAnonymous = parseBoolean(row[7]) // H - is_anonymous
+        const userName = (row[8] || "").trim() // I - quip_response_user_name
+
+        // Skip empty rows
+        if (!responseId || !rowQuipId || !responseText) {
+          continue
+        }
+
+        // Parse created_at date safely
+        let validCreatedAt: string
+        try {
+          validCreatedAt = createdAt
+            ? parseDateSafely(createdAt).toISOString()
+            : new Date().toISOString()
+        } catch (error) {
+          validCreatedAt = new Date().toISOString()
+        }
+
+        // Normalize sentiment
+        const normalizedSentiment = normalizeSentiment(sentiment)
+
+        responses.push({
+          id: responseId,
+          quip_id: rowQuipId,
+          response: responseText,
+          department: department || "Unknown",
+          user_id: userId || "unknown",
+          created_at: validCreatedAt,
+          sentiment: normalizedSentiment === "neutral" ? undefined : normalizedSentiment,
+          is_anonymous: isAnonymous,
+          user_name: userName || (isAnonymous ? "Anonymous" : "Unknown User"),
+        })
+      }
+
+      return responses
+    } catch (error) {
+      // If this sheet name failed, try the next one
+      if (error instanceof Error && error.message.includes("400")) {
+        continue
+      }
+      // If it's a different error, log it but continue trying
+      console.warn(`Failed to fetch from sheet "${sheetName}":`, error)
+      continue
+    }
+  }
+
+  // If all sheet name variations failed, try to discover available sheets
+  try {
+    const metadataUrl = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}?key=${apiKey}&fields=sheets.properties.title`
+    const metadataResponse = await fetch(metadataUrl)
+
+    if (metadataResponse.ok) {
+      const metadata = await metadataResponse.json()
+      const availableSheets = metadata.sheets?.map((s: any) => s.properties.title) || []
+      console.log("[Quip Responses] Available sheets:", availableSheets)
+
+      // Try likely response sheet names from available sheets
+      const likelySheets = availableSheets.filter((name: string) =>
+        name.toLowerCase().includes("response") || name.toLowerCase().includes("quip")
+      )
+
+      for (const sheetName of likelySheets) {
+        try {
+          const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${encodeURIComponent(sheetName)}${QUIP_RESPONSES_SHEET_RANGE}?key=${apiKey}`
+          const response = await fetch(url)
+
+          if (response.ok) {
+            const data = await response.json()
+            if (data.values && data.values.length > 0) {
+              // Parse the data (same logic as above)
+              const responses: QuipResponse[] = []
+              for (let i = 0; i < data.values.length; i++) {
+                const row = data.values[i]
+                const responseId = (row[0] || "").trim()
+                const rowQuipId = (row[1] || "").trim()
+                const responseText = (row[2] || "").trim()
+                const department = (row[3] || "").trim()
+                const userId = (row[4] || "").trim()
+                const createdAt = (row[5] || "").trim()
+                const sentiment = (row[6] || "").trim()
+                const isAnonymous = parseBoolean(row[7])
+                const userName = (row[8] || "").trim()
+
+                if (!responseId || !rowQuipId || !responseText) {
+                  continue
+                }
+
+                let validCreatedAt: string
+                try {
+                  validCreatedAt = createdAt
+                    ? parseDateSafely(createdAt).toISOString()
+                    : new Date().toISOString()
+                } catch (error) {
+                  validCreatedAt = new Date().toISOString()
+                }
+
+                const normalizedSentiment = normalizeSentiment(sentiment)
+
+                responses.push({
+                  id: responseId,
+                  quip_id: rowQuipId,
+                  response: responseText,
+                  department: department || "Unknown",
+                  user_id: userId || "unknown",
+                  created_at: validCreatedAt,
+                  sentiment: normalizedSentiment === "neutral" ? undefined : normalizedSentiment,
+                  is_anonymous: isAnonymous,
+                  user_name: userName || (isAnonymous ? "Anonymous" : "Unknown User"),
+                })
+              }
+              return responses
+            }
+          }
+        } catch (error) {
+          continue
+        }
+      }
+    }
+  } catch (error) {
+    console.error("Failed to discover available sheets:", error)
+  }
+
+  // If all attempts failed, return empty array
+  console.warn("Could not find quip responses sheet. Tried:", QUIP_RESPONSES_SHEET_NAMES)
+  return []
+}
+
+/**
  * Fetch all quips from mock data (fallback)
  */
 export async function getQuipsFromMock(): Promise<Quip[]> {

@@ -17,7 +17,7 @@ import {
   convertFeedbackArray,
   type Feedback
 } from "@/lib/data/feedbacks"
-import { getFeedbacksFromSheet, getQuipsFromSheet, getQuipResponsesFromMock, createQuipInMock, updateQuipStatus, sendDebugLog } from "@/lib/api"
+import { getFeedbacksFromSheet, getQuipsFromSheet, getQuipResponsesFromSheet, createQuipInMock, updateQuipStatus, sendDebugLog } from "@/lib/api"
 import type { Category, FeedbackItem, DashboardStats, CategoryData, Quip, QuipResponse } from "@/types"
 import { QuipList } from "@/components/quips/QuipList"
 import { QuipDetail } from "@/components/quips/QuipDetail"
@@ -106,7 +106,29 @@ export default function DashboardPage() {
     if (!isAdmin) return
     try {
       const data = await getQuipsFromSheet()
-      setQuips(data)
+      
+      // Fetch all quip responses and calculate counts
+      try {
+        const allResponses = await getQuipResponsesFromSheet()
+        
+        // Calculate response counts per quip
+        const countsByQuipId: Record<string, number> = {}
+        allResponses.forEach((response) => {
+          countsByQuipId[response.quip_id] = (countsByQuipId[response.quip_id] || 0) + 1
+        })
+        
+        // Attach response counts to quips
+        const quipsWithCounts = data.map((quip) => ({
+          ...quip,
+          responses: countsByQuipId[quip.id] || 0,
+        }))
+        
+        setQuips(quipsWithCounts)
+      } catch (error) {
+        // If responses can't be fetched, still show quips without counts
+        console.warn("Failed to fetch quip responses, showing quips without counts:", error)
+        setQuips(data.map((quip) => ({ ...quip, responses: 0 })))
+      }
     } catch (error) {
       console.error("Failed to fetch quips:", error)
     }
@@ -158,7 +180,9 @@ export default function DashboardPage() {
   const handleViewResponses = async (quip: Quip) => {
     setSelectedQuip(quip)
     try {
-      const responses = await getQuipResponsesFromMock(quip.id)
+      const allResponses = await getQuipResponsesFromSheet()
+      // Filter responses for this specific quip
+      const responses = allResponses.filter((r) => r.quip_id === quip.id)
       setQuipResponses(responses)
     } catch (error) {
       console.error("Failed to fetch responses:", error)
