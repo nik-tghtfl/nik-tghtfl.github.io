@@ -4,11 +4,12 @@ import { useEffect, useState, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Megaphone } from "lucide-react"
+import { Megaphone, Plus } from "lucide-react"
 import { useAuth } from "@/lib/hooks/useAuth"
 import { QuipList } from "@/components/quips/QuipList"
 import { RespondModal } from "@/components/quips/RespondModal"
-import { getQuipsFromSheet, submitQuipResponse } from "@/lib/api"
+import { CreateQuipModal } from "@/components/quips/CreateQuipModal"
+import { getQuipsFromSheet, submitQuipResponse, createQuipInMock, getQuipResponsesFromSheet } from "@/lib/api"
 import type { Quip, QuipResponse } from "@/types"
 
 /**
@@ -72,12 +73,13 @@ if (typeof window !== "undefined") {
 
 export default function QuipsPage() {
   const router = useRouter()
-  const { user, isLoading } = useAuth()
+  const { user, isLoading, isAdmin } = useAuth()
   const [mounted, setMounted] = useState(false)
   const [quips, setQuips] = useState<Quip[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedQuip, setSelectedQuip] = useState<Quip | null>(null)
   const [respondModalOpen, setRespondModalOpen] = useState(false)
+  const [createQuipModalOpen, setCreateQuipModalOpen] = useState(false)
   const [respondedQuipIds, setRespondedQuipIds] = useState<Set<string>>(new Set())
 
   useEffect(() => {
@@ -104,15 +106,38 @@ export default function QuipsPage() {
     setLoading(true)
     try {
       const data = await getQuipsFromSheet()
-      // Filter to only active quips for users
-      const activeQuips = data.filter(q => q.status === "active")
-      setQuips(activeQuips)
+      
+      // For admins, show all quips (active and closed). For regular users, only active
+      if (isAdmin) {
+        // Also fetch responses to calculate counts
+        try {
+          const allResponses = await getQuipResponsesFromSheet()
+          const countsByQuipId: Record<string, number> = {}
+          allResponses.forEach((response) => {
+            countsByQuipId[response.quip_id] = (countsByQuipId[response.quip_id] || 0) + 1
+          })
+          
+          const quipsWithCounts = data.map((quip) => ({
+            ...quip,
+            responses: countsByQuipId[quip.id] || 0,
+          }))
+          
+          setQuips(quipsWithCounts)
+        } catch (error) {
+          console.warn("Failed to fetch quip responses, showing quips without counts:", error)
+          setQuips(data.map((quip) => ({ ...quip, responses: 0 })))
+        }
+      } else {
+        // Filter to only active quips for regular users
+        const activeQuips = data.filter(q => q.status === "active")
+        setQuips(activeQuips)
+      }
     } catch (error) {
       console.error("Failed to fetch quips:", error)
     } finally {
       setLoading(false)
     }
-  }, [user])
+  }, [user, isAdmin])
 
   useEffect(() => {
     if (mounted && !isLoading && user) {
@@ -143,6 +168,27 @@ export default function QuipsPage() {
     }
   }
 
+  const handleViewResponses = (quip: Quip) => {
+    // Navigate to dashboard - the dashboard will handle showing the quip detail
+    router.push(`/dashboard?quipId=${quip.id}`)
+  }
+
+  const handleCreateQuip = async (
+    newQuip: Omit<Quip, "id" | "created_at" | "responses">
+  ) => {
+    if (!user) return
+    try {
+      await createQuipInMock({
+        ...newQuip,
+        created_by: user.id,
+      })
+      await fetchQuips()
+    } catch (error) {
+      console.error("Failed to create quip:", error)
+      throw error
+    }
+  }
+
   // Show loading state while checking auth
   if (!mounted || isLoading || !user) {
     return (
@@ -166,13 +212,27 @@ export default function QuipsPage() {
             <div>
               <h1 className="text-2xl font-bold text-foreground">Open Quips</h1>
               <p className="text-muted-foreground">
-                Share your anonymous feedback on these topics.
+                {isAdmin 
+                  ? "Manage quips and view responses from your team."
+                  : "Share your anonymous feedback on these topics."
+                }
               </p>
             </div>
           </div>
-          <Button variant="outline" asChild>
-            <Link href="/">Back to Home</Link>
-          </Button>
+          <div className="flex items-center gap-2">
+            {isAdmin && (
+              <Button
+                className="bg-blue-600 hover:bg-blue-700 text-white"
+                onClick={() => setCreateQuipModalOpen(true)}
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Create Quip
+              </Button>
+            )}
+            <Button variant="outline" asChild>
+              <Link href="/">Back to Home</Link>
+            </Button>
+          </div>
         </div>
 
         {loading ? (
@@ -183,9 +243,10 @@ export default function QuipsPage() {
         ) : (
           <QuipList
             quips={quips}
-            variant="employee"
+            variant={isAdmin ? "admin" : "employee"}
             respondedQuipIds={respondedQuipIds}
             onRespond={handleRespond}
+            onViewResponses={isAdmin ? handleViewResponses : undefined}
             emptyMessage="No open quips right now."
           />
         )}
@@ -195,9 +256,17 @@ export default function QuipsPage() {
         open={respondModalOpen}
         onOpenChange={setRespondModalOpen}
         quip={selectedQuip}
-        defaultDepartment={user.team}
+        defaultDepartment={user?.team || ""}
         onSubmit={handleSubmitResponse}
       />
+
+      {isAdmin && (
+        <CreateQuipModal
+          open={createQuipModalOpen}
+          onOpenChange={setCreateQuipModalOpen}
+          onCreate={handleCreateQuip}
+        />
+      )}
     </div>
   )
 }

@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState, useCallback } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -26,6 +26,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 export default function DashboardPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { user, isLoading, isAdmin } = useAuth()
   const [mounted, setMounted] = useState(false)
   const [activeFilter, setActiveFilter] = useState<Category>("All")
@@ -101,6 +102,19 @@ export default function DashboardPage() {
     }
   }, [mounted, isLoading, user, router])
 
+  const handleViewResponses = useCallback(async (quip: Quip) => {
+    setSelectedQuip(quip)
+    try {
+      const allResponses = await getQuipResponsesFromSheet()
+      // Filter responses for this specific quip
+      const responses = allResponses.filter((r) => r.quip_id === quip.id)
+      setQuipResponses(responses)
+    } catch (error) {
+      console.error("Failed to fetch responses:", error)
+      setQuipResponses([])
+    }
+  }, [])
+
   // Fetch quips
   const fetchQuips = useCallback(async () => {
     if (!isAdmin) return
@@ -124,6 +138,17 @@ export default function DashboardPage() {
         }))
         
         setQuips(quipsWithCounts)
+        
+        // Check if there's a quipId in URL params and auto-select it
+        const quipIdFromUrl = searchParams?.get("quipId")
+        if (quipIdFromUrl) {
+          const quipToSelect = quipsWithCounts.find((q) => q.id === quipIdFromUrl)
+          if (quipToSelect) {
+            handleViewResponses(quipToSelect)
+            // Clear the URL parameter
+            router.replace("/dashboard", { scroll: false })
+          }
+        }
       } catch (error) {
         // If responses can't be fetched, still show quips without counts
         console.warn("Failed to fetch quip responses, showing quips without counts:", error)
@@ -132,7 +157,7 @@ export default function DashboardPage() {
     } catch (error) {
       console.error("Failed to fetch quips:", error)
     }
-  }, [isAdmin])
+  }, [isAdmin, searchParams, router, handleViewResponses])
 
   // Fetch feedbacks when component mounts and user is authenticated
   useEffect(() => {
@@ -177,7 +202,7 @@ export default function DashboardPage() {
     }
   }
 
-  const handleViewResponses = async (quip: Quip) => {
+  const handleViewResponses = useCallback(async (quip: Quip) => {
     setSelectedQuip(quip)
     try {
       const allResponses = await getQuipResponsesFromSheet()
@@ -188,7 +213,7 @@ export default function DashboardPage() {
       console.error("Failed to fetch responses:", error)
       setQuipResponses([])
     }
-  }
+  }, [])
 
   /**
    * Clear all quip response tracking from localStorage
