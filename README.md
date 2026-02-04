@@ -117,8 +117,16 @@ npm run build
 ### Required for V0.2+ (Feedback Submission)
 
 ```env
-# n8n Webhook URL (required for feedback submission)
-NEXT_PUBLIC_N8N_WEBHOOK_URL=https://your-n8n-instance.com/webhook/your-webhook-id
+# n8n Webhook URLs (required for feedback + quips)
+
+# General feedback submission (main feedback form)
+NEXT_PUBLIC_N8N_WEBHOOK_URL=https://your-n8n-instance.com/webhook/your-general-feedback-webhook-id
+
+# Quip creation (admin creates a new quip)
+NEXT_PUBLIC_N8N_QUIP_WEBHOOK_URL=https://your-n8n-instance.com/webhook/your-quip-creation-webhook-id
+
+# Quip responses (employees respond to a quip)
+NEXT_PUBLIC_N8N_QUIP_RESPONSE_WEBHOOK_URL=https://your-n8n-instance.com/webhook/your-quip-response-webhook-id
 ```
 
 ### Required for V0.4+ (Dashboard - Google Sheets Integration)
@@ -155,7 +163,9 @@ NEXT_PUBLIC_GOOGLE_GEMINI_API_KEY=your_gemini_api_key_here
 
 1. Go to your GitHub repository → **Settings** → **Secrets and variables** → **Actions**
 2. Add the following repository secrets:
-   - `NEXT_PUBLIC_N8N_WEBHOOK_URL` - Your n8n webhook URL
+   - `NEXT_PUBLIC_N8N_WEBHOOK_URL` - Your general feedback n8n webhook URL
+   - `NEXT_PUBLIC_N8N_QUIP_WEBHOOK_URL` - Your quip creation n8n webhook URL
+   - `NEXT_PUBLIC_N8N_QUIP_RESPONSE_WEBHOOK_URL` - Your quip response n8n webhook URL
    - `NEXT_PUBLIC_GOOGLE_SHEET_ID` - Your Google Sheet ID (from the sheet URL)
    - `NEXT_PUBLIC_GOOGLE_API_KEY` - Your Google Sheets API key
    - `NEXT_PUBLIC_GOOGLE_GEMINI_API_KEY` - Your Google Gemini API key
@@ -170,8 +180,16 @@ The GitHub Actions workflow will automatically use these secrets during the buil
 Create a `.env.local` file in the project root:
 
 ```env
-# n8n Webhook (V0.2+)
-NEXT_PUBLIC_N8N_WEBHOOK_URL=https://your-n8n-instance.com/webhook/your-webhook-id
+# n8n Webhooks (V0.2+)
+
+# General feedback submission
+NEXT_PUBLIC_N8N_WEBHOOK_URL=https://your-n8n-instance.com/webhook/your-general-feedback-webhook-id
+
+# Quip creation
+NEXT_PUBLIC_N8N_QUIP_WEBHOOK_URL=https://your-n8n-instance.com/webhook/your-quip-creation-webhook-id
+
+# Quip responses
+NEXT_PUBLIC_N8N_QUIP_RESPONSE_WEBHOOK_URL=https://your-n8n-instance.com/webhook/your-quip-response-webhook-id
 
 # Google Sheets Integration (V0.4+)
 NEXT_PUBLIC_GOOGLE_SHEET_ID=your_google_sheet_id_here

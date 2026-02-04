@@ -125,10 +125,16 @@ export function FeedbackForm({ user }: FeedbackFormProps) {
     isAnonymous: boolean
     user: User
   }): Promise<void> => {
-    const webhookUrl = process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL
+    // Read from env with a safe fallback to the production general feedback webhook
+    const envVar = process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL
+    const webhookUrl =
+      (envVar && envVar !== "undefined" && envVar.trim()) ||
+      "https://niktaughtful.app.n8n.cloud/webhook/8cc771d8-78fc-44bb-90ad-b3d5ac2ab7e4"
 
-    if (!webhookUrl) {
-      throw new Error("Webhook URL is not configured. Please set NEXT_PUBLIC_N8N_WEBHOOK_URL in your environment variables.")
+    if (!webhookUrl || webhookUrl === "undefined") {
+      throw new Error(
+        "General feedback webhook URL is not configured. Please set NEXT_PUBLIC_N8N_WEBHOOK_URL in your environment variables."
+      )
     }
 
     // Generate unique submission ID

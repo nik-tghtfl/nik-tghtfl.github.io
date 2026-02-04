@@ -87,8 +87,14 @@ This requires additional setup with OAuth. For now, Option A is recommended.
 
 ```env
 # n8n Webhook URLs
-NEXT_PUBLIC_N8N_WEBHOOK_URL=https://your-instance.app.n8n.cloud/webhook/your-webhook-id
-NEXT_PUBLIC_N8N_QUIP_WEBHOOK_URL=https://your-instance.app.n8n.cloud/webhook/your-quip-webhook-id
+# General feedback submissions (main feedback form)
+NEXT_PUBLIC_N8N_WEBHOOK_URL=https://your-instance.app.n8n.cloud/webhook/your-general-feedback-webhook-id
+
+# Quip creation (admin creates a new quip)
+NEXT_PUBLIC_N8N_QUIP_WEBHOOK_URL=https://your-instance.app.n8n.cloud/webhook/your-quip-creation-webhook-id
+
+# Quip responses (employees respond to a quip)
+NEXT_PUBLIC_N8N_QUIP_RESPONSE_WEBHOOK_URL=https://your-instance.app.n8n.cloud/webhook/your-quip-response-webhook-id
 
 # Google Sheets Integration
 NEXT_PUBLIC_GOOGLE_SHEET_ID=your_sheet_id_here
