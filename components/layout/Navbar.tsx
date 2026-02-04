@@ -3,10 +3,17 @@
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
+import { Menu } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/lib/hooks/useAuth"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 function Logo() {
   const [imageSrc, setImageSrc] = useState('/logo.png');
@@ -115,12 +122,6 @@ export function Navbar() {
     )
   }
 
-  // #region agent log
-  if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
-    console.log('[NAVBAR DEBUG] Rendering full navbar', { hasUser: !!user, navLinksCount: navLinks.length });
-  }
-  // #endregion
-
   // Determine which links to show based on auth state
   const navLinks = []
   
@@ -145,6 +146,20 @@ export function Navbar() {
     navLinks.push({ href: "/login", label: "Login" })
   }
 
+  // #region agent log
+  if (
+    typeof window !== "undefined" &&
+    (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
+  ) {
+    console.log("[NAVBAR DEBUG] Rendering full navbar", {
+      hasUser: !!user,
+      navLinksCount: navLinks.length,
+    })
+  }
+  // #endregion
+
+  const firstName = user?.displayName.split(" ")[0] ?? ""
+
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
@@ -152,8 +167,9 @@ export function Navbar() {
           <Logo />
         </Link>
 
-        <div className="flex items-center gap-4">
-          <nav className="flex items-center gap-1">
+        <div className="flex items-center gap-3">
+          {/* Desktop navigation */}
+          <nav className="hidden md:flex items-center gap-1">
             {navLinks.map((link) => {
               const isActive = pathname === link.href
               return (
@@ -173,13 +189,11 @@ export function Navbar() {
             })}
           </nav>
 
-          {/* User Info and Logout */}
+          {/* Desktop User Info and Logout */}
           {user && (
-            <div className="flex items-center gap-3 border-l border-border pl-4">
+            <div className="hidden md:flex items-center gap-3 border-l border-border pl-4">
               <div className="flex items-center gap-2">
-                <span className="text-sm text-foreground">
-                  Hi, {user.displayName.split(" ")[0]}
-                </span>
+                <span className="text-sm text-foreground">Hi, {firstName}</span>
                 {isAdmin && (
                   <Badge variant="secondary" className="text-xs">
                     Admin
@@ -196,6 +210,50 @@ export function Navbar() {
               </Button>
             </div>
           )}
+
+          {/* Mobile menu */}
+          <div className="flex items-center gap-2 md:hidden">
+            {user && (
+              <span className="text-sm text-foreground max-w-[120px] truncate">
+                Hi, {firstName}
+              </span>
+            )}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="icon" className="h-9 w-9">
+                  <Menu className="h-5 w-5" />
+                  <span className="sr-only">Open navigation</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                {navLinks.map((link) => {
+                  const isActive = pathname === link.href
+                  return (
+                    <DropdownMenuItem
+                      key={link.href}
+                      className={cn("cursor-pointer", isActive && "font-medium text-primary")}
+                      onClick={() => router.push(link.href)}
+                    >
+                      {link.label}
+                    </DropdownMenuItem>
+                  )
+                })}
+                {user && (
+                  <>
+                    <DropdownMenuItem disabled className="text-xs opacity-70">
+                      {isAdmin ? "Admin" : "Member"}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      className="cursor-pointer text-orange-600"
+                      onClick={handleLogout}
+                    >
+                      Logout
+                    </DropdownMenuItem>
+                  </>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
       </div>
     </header>

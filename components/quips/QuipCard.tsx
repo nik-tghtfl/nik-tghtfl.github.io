@@ -86,7 +86,7 @@ export function QuipCard({
         </Badge>
       )}
       <CardHeader className="flex-row items-start justify-between space-y-0">
-        <div className={`flex items-start gap-2 ${showNewBadge ? "pr-16" : ""}`}>
+        <div className={`flex items-start gap-2 ${showNewBadge ? "pr-12" : ""}`}>
           <div className="flex-shrink-0 flex items-center justify-center w-5 h-5">
             <Megaphone className="w-5 h-5 text-blue-600" />
           </div>
