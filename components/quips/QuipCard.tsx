@@ -78,9 +78,17 @@ export function QuipCard({
 
   return (
     <Card className="relative h-full flex flex-col transition-transform duration-200 ease-out hover:-translate-y-1 hover:shadow-lg hover:shadow-blue-100/80">
+      {/* NEW badge – top-right, only for active employee-facing quips */}
+      {variant === "employee" && isNewQuip && quip.status === "active" && (
+        <Badge className="absolute top-4 right-4 bg-blue-600 text-white text-xs font-medium px-2 py-1 rounded">
+          NEW
+        </Badge>
+      )}
       <CardHeader className="flex-row items-start justify-between space-y-0">
         <div className="flex items-center gap-2">
-          <Megaphone className="h-5 w-5 text-blue-600" />
+          <div className="flex-shrink-0 flex items-center justify-center w-5 h-5">
+            <Megaphone className="w-5 h-5 text-blue-600" />
+          </div>
           <CardTitle className="text-base">{quip.title}</CardTitle>
         </div>
         <div className="flex items-center gap-2">
@@ -105,9 +113,6 @@ export function QuipCard({
             </DropdownMenu>
           ) : (
             <>
-              {isNewQuip && quip.status === "active" && (
-                <Badge className="bg-blue-600 text-white">NEW</Badge>
-              )}
               {hasResponded && (
                 <Badge
                   variant="secondary"
