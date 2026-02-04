@@ -58,7 +58,8 @@ export function RespondModal({
       quip_id: quip.id,
       response: response.trim(),
       department,
-      user_id: "user-1",
+      // For now, send a simple numeric user id instead of the older "user-1" format
+      user_id: "1",
       sentiment: undefined,
       is_anonymous: isAnonymous,
     })
