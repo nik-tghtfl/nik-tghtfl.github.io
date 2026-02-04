@@ -77,7 +77,7 @@ export function QuipCard({
   const endingSoon = isEndingSoon(quip.deadline)
 
   return (
-    <Card className="relative transition-transform duration-200 ease-out hover:-translate-y-1 hover:shadow-lg hover:shadow-blue-100/80">
+    <Card className="relative h-full flex flex-col transition-transform duration-200 ease-out hover:-translate-y-1 hover:shadow-lg hover:shadow-blue-100/80">
       <CardHeader className="flex-row items-start justify-between space-y-0">
         <div className="flex items-center gap-2">
           <Megaphone className="h-5 w-5 text-blue-600" />
@@ -122,11 +122,9 @@ export function QuipCard({
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-3">
-        <p className="text-muted-foreground text-sm">
-          {'"'}
+      <CardContent className="space-y-3 flex-1">
+        <p className="text-muted-foreground text-sm leading-relaxed break-words">
           {quip.description || quip.title}
-          {'"'}
         </p>
 
         {variant === "admin" ? (
